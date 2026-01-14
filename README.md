@@ -63,6 +63,14 @@ Version 2 is a complete rewrite with a modernized architecture:
 - **Responsive design** - UI remains interactive during discovery
 - **Click-to-inspect** - node details (hostname, IP, platform) on selection
 
+### Export & Integration
+- **JSON output** - Structured topology data in `map.json` format
+- **GraphML export** - Export to yEd with embedded device icons
+- **Python API** - Programmatic access to export functionality
+- **CLI tools** - `sc2-export` command for automated workflows
+- **Multiple layouts** - Grid, circle, and list layout algorithms
+- **Flexible filtering** - Exclude endpoints or standalone devices
+
 ### Supported Platforms
 | Vendor | SNMP | SSH | Notes |
 |--------|------|-----|-------|
@@ -179,7 +187,16 @@ python -m sc2.scng.discovery crawl 192.168.1.1 10.0.0.1 \
     --output ./network_maps
 ```
 
-### 4. Launch GUI
+### 4. Export Topology
+```bash
+# Export to yEd GraphML format
+python -m sc2.export graphml ./network_maps/map.json network_topology.graphml
+
+# Or use the installed command
+sc2-export graphml ./network_maps/map.json network_topology.graphml
+```
+
+### 5. Launch GUI
 ```bash
 python -m sc2.ui
 ```
@@ -261,12 +278,13 @@ The viewer uses base64 encoding for reliable Python→JavaScript data transfer, 
 
 ## CLI Reference
 
-Secure Cartography provides two CLI modules that can be used independently of the GUI:
+Secure Cartography provides three CLI modules that can be used independently of the GUI:
 
 - `sc2.scng.creds` - Credential vault management
 - `sc2.scng.discovery` - Network discovery engine
+- `sc2.export` - Topology export to various formats
 
-Both CLIs support `--help` on all commands and subcommands.
+All CLIs support `--help` on all commands and subcommands.
 
 ---
 
@@ -462,6 +480,46 @@ This means exclusions work for both SNMP-discovered devices (via sysDescr) and S
 
 ---
 
+### Topology Export (`sc2.export`)
+
+```
+usage: sc2.export [-h] {graphml} ...
+```
+
+#### Commands
+
+##### `graphml` - Export to yEd GraphML format
+
+```bash
+# Basic export with icons
+python -m sc2.export graphml map.json network.graphml
+
+# Export without icons
+python -m sc2.export graphml map.json network.graphml --no-icons
+
+# Export with options
+python -m sc2.export graphml map.json network.graphml \
+    --layout circle \
+    --no-endpoints \
+    --connected-only
+```
+
+**GraphML Options:**
+
+| Option | Description |
+|--------|-------------|
+| `input` | Input topology JSON file (map.json) |
+| `output` | Output GraphML file path |
+| `--no-icons` | Use shapes instead of embedded icons |
+| `--no-endpoints` | Exclude endpoint devices (phones, cameras, etc.) |
+| `--connected-only` | Only include devices that have connections |
+| `--icons-dir PATH` | Custom directory containing icon files |
+| `--layout {grid,circle,list}` | Initial layout algorithm (default: grid) |
+| `--font-size SIZE` | Font size for labels (default: 12) |
+| `--font-family FAMILY` | Font family for labels (default: Dialog) |
+
+---
+
 ## Output Format
 
 Discovery creates per-device folders with JSON data:
@@ -498,6 +556,58 @@ discovery_output/
   }
 }
 ```
+
+---
+
+## Exporting Topology
+
+After discovery, you can export the topology to various formats for visualization and documentation.
+
+### Export to GraphML (yEd)
+
+Export topology maps to yEd-compatible GraphML format with embedded device icons:
+
+```bash
+# Basic export
+python -m sc2.export graphml map.json network.graphml
+
+# Export without icons (shapes only)
+python -m sc2.export graphml map.json network.graphml --no-icons
+
+# Export with circular layout
+python -m sc2.export graphml map.json network.graphml --layout circle
+
+# Export excluding endpoint devices
+python -m sc2.export graphml map.json network.graphml --no-endpoints
+
+# Export only connected devices (exclude standalone nodes)
+python -m sc2.export graphml map.json network.graphml --connected-only
+
+# Using installed command
+sc2-export graphml discovery_output/map.json topology.graphml
+```
+
+**GraphML Export Options:**
+
+| Option | Description |
+|--------|-------------|
+| `--no-icons` | Use simple shapes instead of embedded device icons |
+| `--no-endpoints` | Exclude endpoint devices (phones, cameras, printers) |
+| `--connected-only` | Only include devices with at least one connection |
+| `--layout {grid,circle,list}` | Initial layout algorithm (default: grid) |
+| `--icons-dir PATH` | Custom directory containing icon files |
+| `--font-size SIZE` | Font size for labels (default: 12) |
+| `--font-family FAMILY` | Font family for labels (default: Dialog) |
+
+**Supported Platforms for Icons:**
+- Cisco (IOS, NX-OS, Catalyst, Nexus, ISR, ASR, CSR)
+- Arista (EOS, vEOS, DCS)
+- Juniper (JUNOS, EX, QFX, MX, SRX)
+- Palo Alto
+- Fortinet
+- Generic (Router, Switch, Firewall, Wireless AP)
+
+The exported GraphML files can be opened in [yEd Graph Editor](https://www.yworks.com/products/yed) for interactive visualization, layout adjustment, and diagram export.
 
 ---
 
@@ -543,14 +653,18 @@ See [README_Style_Guide.md](README_Style_Guide.md) for widget styling details.
 - Discovery↔UI integration with throttled events
 - Live topology preview with Cytoscape.js
 - Undiscovered peer node visualization
+- **GraphML export with device icons**
+- **Python CLI export tool (`sc2-export`)**
+- **JSON topology format**
 
 ### 📋 Planned
 - Map enhancement tools (manual node positioning, annotations)
 - Credential auto-discovery integration
 - Settings persistence
-- Export topology as PNG/SVG
+- Export topology as PNG/SVG from GUI
 - Full-screen topology viewer
 - Topology diff (compare discoveries)
+- Additional export formats (Visio, Draw.io)
 
 ---
 

@@ -87,6 +87,7 @@ setup(
             "sc2=sc2.ui.__main__:main",
             "sc2-creds=sc2.scng.creds.cli:main",
             "sc2-discover=sc2.scng.discovery.cli:main",
+            "sc2-export=sc2.export.cli:main",
         ],
         "gui_scripts": [
             "secure-cartography=sc2.ui.__main__:main",

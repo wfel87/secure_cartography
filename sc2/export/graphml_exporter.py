@@ -149,8 +149,8 @@ class GraphMLExporter:
             # This will work for editable installs and source runs
             try:
                 self.icons_dir = get_resource_dir(self._icons_package)
-            except RuntimeError:
-                # Package is zipped - icons_dir won't work, but _load_icon will
+            except (RuntimeError, ModuleNotFoundError, ImportError):
+                # Package is zipped or UI not available - icons_dir won't work, but _load_icon will
                 self.icons_dir = None
 
         # Rest of __init__ stays the same...
