@@ -148,7 +148,7 @@ def cmd_graphml(args) -> int:
     try:
         exporter = GraphMLExporter(
             use_icons=not args.no_icons,
-            icons_dir=args.icons_dir if args.icons_dir else None,
+            icons_dir=args.icons_dir,
             include_endpoints=not args.no_endpoints,
             connected_only=args.connected_only,
             layout_type=args.layout,
